@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="NRED × 디지털인사이트 지면광고 디자인 광고시안 제안서">
+<meta name="robots" content="noindex,nofollow">
+<title>NPLEY × NRED 제안서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: letterboxed 16:9 stage on black; each slide = base image + live header layers animated by GSAP */
+:root{
+  --bg:#050505; --chrome:#111111; --line:#262626; --fg:#f2f2f2; --muted:#8a8a8a; --accent:#ff2a2a;
+  --ui:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);overflow:hidden;-webkit-font-smoothing:antialiased}
+.app{height:100%;display:grid;grid-template-rows:1fr auto;padding-inline:16px;box-sizing:border-box}
+.stage-wrap{display:grid;place-items:center;min-height:0;padding-block:16px 10px}
+.stage{position:relative;width:min(100%, calc((100vh - 96px) * 16 / 9));aspect-ratio:16/9;max-width:100%;background:#000;overflow:hidden;
+  box-shadow:0 0 0 1px var(--line);touch-action:pan-y;cursor:pointer;user-select:none;-webkit-user-select:none}
+.sl{position:absolute;inset:0;visibility:hidden}
+.sl img{display:block;pointer-events:none;-webkit-user-drag:none}
+.base{position:absolute;inset:0;width:100%;height:100%;will-change:transform,opacity}
+.ly{position:absolute;will-change:transform,opacity}
+.ly>img{width:100%;height:100%}
+.mask{position:absolute;left:0;width:100%;overflow:hidden;contain:paint}
+.inner{position:absolute;inset:0;will-change:transform,opacity;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.inner>img{position:absolute;left:0;width:100%;backface-visibility:hidden}
+
+.bar{display:flex;align-items:center;gap:14px;padding-block:10px 14px;max-width:calc((100vh - 96px) * 16 / 9);width:100%;margin-inline:auto;box-sizing:border-box}
+.count{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.count b{color:var(--fg);font-weight:500}
+.meta{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px;overflow:hidden;height:36px;justify-content:center}
+.chap{font-size:11px;letter-spacing:.08em;color:var(--accent);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{position:relative;height:2px;background:var(--line);flex:2;min-width:60px}
+.track i{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent)}
+.btns{display:flex;gap:6px}
+button{font:inherit;color:var(--fg);background:var(--chrome);border:1px solid var(--line);height:34px;min-width:34px;padding:0 10px;border-radius:6px;cursor:pointer;display:inline-grid;place-items:center;font-size:13px}
+button:hover{border-color:#444}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+.grid{position:fixed;inset:0;background:rgba(5,5,5,.96);z-index:10;overflow:auto;padding:calc(24px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.grid-head{max-width:1200px;margin:0 auto 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.grid-head h2{margin:0;font-size:16px;font-weight:700}
+.grid-list{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.thumb{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.thumb img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;box-shadow:0 0 0 1px var(--line);transition:box-shadow .2s}
+.thumb:hover img,.thumb:focus-visible img,.thumb.on img{box-shadow:0 0 0 2px var(--accent)}
+.thumb span{font-size:12px;color:var(--muted);display:flex;gap:8px}
+.thumb span em{font-style:normal;font-family:var(--mono);color:var(--fg)}
+.hint{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--fg)}
+@media (max-width:640px){.track,.hint-k{display:none}.name{font-size:13px}}
+
+.gate[hidden],.app[hidden]{display:none}
+.gate{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg);padding:24px}
+.gate[hidden],.app[hidden]{display:none}
+.gate form{width:min(100%,340px);display:flex;flex-direction:column;gap:14px}
+.gate h1{margin:0 0 6px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+.gate h1 span{color:var(--accent)}
+.gate p{margin:0 0 6px;font-size:13px;color:var(--muted)}
+.gate label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
+.gate input{font:inherit;font-size:15px;color:var(--fg);background:var(--chrome);border:1px solid var(--line);border-radius:6px;height:42px;padding:0 12px}
+.gate input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gate .go{height:42px;background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;font-size:14px}
+.gate .go:hover{border-color:#fff}
+.gate .err{min-height:18px;margin:0;font-size:12px;color:#ff6b6b}
+</style>
+
+</head>
+<body>
+<div class="gate" id="gate" hidden>
+  <form id="gateForm" autocomplete="off">
+    <h1>NPLEY × <span>NRED</span> 제안서</h1>
+    <p>아이디와 비밀번호를 입력해 주세요.</p>
+    <label>아이디<input id="gId" name="id" type="text" autocapitalize="none" spellcheck="false" required></label>
+    <label>비밀번호<input id="gPw" name="pw" type="password" required></label>
+    <p class="err" id="gErr" role="alert"></p>
+    <button class="go" type="submit">입장</button>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+  <div class="stage-wrap">
+    <div class="stage" id="stage" aria-roledescription="carousel" aria-label="NPLEY × NRED 제안서 슬라이드" tabindex="0"></div>
+  </div>
+  <div class="bar">
+    <div class="count"><b id="cur">01</b> / <span id="tot">49</span></div>
+    <div class="meta"><div class="chap" id="chap"></div><div class="name" id="name"></div></div>
+    <div class="track" aria-hidden="true"><i id="prog"></i></div>
+    <div class="btns">
+      <button id="prev" aria-label="이전 장"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button id="next" aria-label="다음 장"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button id="gridBtn" aria-label="전체 장표 보기"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></button>
+      <button id="fsBtn" aria-label="전체 화면"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<div class="grid" id="grid" hidden>
+  <div class="grid-head">
+    <h2>전체 장표</h2>
+    <span class="hint"><span class="hint-k"><kbd>←</kbd> <kbd>→</kbd> 넘기기 · <kbd>G</kbd> 전체 보기 · <kbd>F</kbd> 전체 화면</span><button id="gridClose">닫기</button></span>
+  </div>
+  <div class="grid-list" id="gridList"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+const SLIDES=[{"c": "표지", "t": "NPLEY × NRED", "base": "assets/base-01.webp", "thumb": "assets/thumb-01.webp", "layers": []}, {"c": "전략 기준", "t": "광고 목표 · 포지셔닝", "base": "assets/base-02.webp", "thumb": "assets/thumb-02.webp", "layers": [{"k": "bg", "src": "assets/bg-02.webp", "x": 66, "y": 53, "w": 339, "h": 110, "lines": []}, {"k": "eye", "src": "assets/eye-02.webp", "x": 1029, "y": 37, "w": 178, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-02.webp", "x": 72, "y": 153, "w": 360, "h": 115, "lines": [[0, 20], [20, 52], [72, 43]]}, {"k": "desc", "src": "assets/desc-02.webp", "x": 882, "y": 214, "w": 326, "h": 37, "lines": []}]}, {"c": "전략 기준", "t": "NRED 디자인 DNA", "base": "assets/base-03.webp", "thumb": "assets/thumb-03.webp", "layers": [{"k": "bg", "src": "assets/bg-03.webp", "x": 67, "y": 55, "w": 339, "h": 108, "lines": []}, {"k": "eye", "src": "assets/eye-03.webp", "x": 1029, "y": 37, "w": 178, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-03.webp", "x": 72, "y": 155, "w": 413, "h": 113, "lines": [[0, 19], [19, 51], [70, 43]]}, {"k": "desc", "src": "assets/desc-03.webp", "x": 876, "y": 213, "w": 332, "h": 38, "lines": []}]}, {"c": "전략 기준", "t": "포지셔닝 문장", "base": "assets/base-04.webp", "thumb": "assets/thumb-04.webp", "layers": [{"k": "bg", "src": "assets/bg-04.webp", "x": 67, "y": 47, "w": 580, "h": 116, "lines": []}, {"k": "eye", "src": "assets/eye-04.webp", "x": 1060, "y": 37, "w": 148, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-04.webp", "x": 72, "y": 153, "w": 353, "h": 115, "lines": [[0, 20], [20, 52], [72, 43]]}, {"k": "desc", "src": "assets/desc-04.webp", "x": 934, "y": 214, "w": 275, "h": 37, "lines": []}]}, {"c": "전략 기준", "t": "에이전시 지형", "base": "assets/base-05.webp", "thumb": "assets/thumb-05.webp", "layers": [{"k": "bg", "src": "assets/bg-05.webp", "x": 67, "y": 55, "w": 774, "h": 124, "lines": []}, {"k": "eye", "src": "assets/eye-05.webp", "x": 1060, "y": 37, "w": 147, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-05.webp", "x": 72, "y": 155, "w": 463, "h": 113, "lines": [[0, 19], [19, 51], [70, 43]]}, {"k": "desc", "src": "assets/desc-05.webp", "x": 755, "y": 213, "w": 453, "h": 39, "lines": []}]}, {"c": "전략 기준", "t": "에이전시 지면 문법", "base": "assets/base-06.webp", "thumb": "assets/thumb-06.webp", "layers": [{"k": "bg", "src": "assets/bg-06.webp", "x": 66, "y": 53, "w": 659, "h": 110, "lines": []}, {"k": "eye", "src": "assets/eye-06.webp", "x": 1036, "y": 37, "w": 171, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-06.webp", "x": 72, "y": 155, "w": 421, "h": 113, "lines": [[0, 19], [19, 54], [73, 40]]}, {"k": "desc", "src": "assets/desc-06.webp", "x": 885, "y": 213, "w": 323, "h": 39, "lines": []}]}, {"c": "크리에이티브", "t": "표현 방향 · 썸네일 가독성", "base": "assets/base-07.webp", "thumb": "assets/thumb-07.webp", "layers": [{"k": "bg", "src": "assets/bg-07.webp", "x": 67, "y": 47, "w": 647, "h": 116, "lines": []}, {"k": "eye", "src": "assets/eye-07.webp", "x": 1030, "y": 37, "w": 177, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-07.webp", "x": 72, "y": 155, "w": 428, "h": 113, "lines": [[0, 19], [19, 51], [70, 43]]}, {"k": "desc", "src": "assets/desc-07.webp", "x": 821, "y": 213, "w": 387, "h": 38, "lines": []}]}, {"c": "크리에이티브", "t": "표현 방향 장단점", "base": "assets/base-08.webp", "thumb": "assets/thumb-08.webp", "layers": [{"k": "bg", "src": "assets/bg-08.webp", "x": 67, "y": 47, "w": 647, "h": 116, "lines": []}, {"k": "eye", "src": "assets/eye-08.webp", "x": 1029, "y": 37, "w": 178, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-08.webp", "x": 72, "y": 155, "w": 428, "h": 113, "lines": [[0, 19], [19, 51], [70, 43]]}, {"k": "desc", "src": "assets/desc-08.webp", "x": 821, "y": 213, "w": 387, "h": 38, "lines": []}]}, {"c": "크리에이티브", "t": "방향 3안 · 단계형", "base": "assets/base-09.webp", "thumb": "assets/thumb-09.webp", "layers": [{"k": "bg", "src": "assets/bg-09.webp", "x": 67, "y": 47, "w": 647, "h": 116, "lines": []}, {"k": "eye", "src": "assets/eye-09.webp", "x": 1066, "y": 37, "w": 142, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-09.webp", "x": 72, "y": 153, "w": 439, "h": 115, "lines": [[0, 20], [20, 55], [75, 40]]}, {"k": "desc", "src": "assets/desc-09.webp", "x": 878, "y": 213, "w": 330, "h": 38, "lines": []}]}, {"c": "크리에이티브", "t": "캠페인 로드맵 · 시안 배치", "base": "assets/base-10.webp", "thumb": "assets/thumb-10.webp", "layers": [{"k": "bg", "src": "assets/bg-10.webp", "x": 67, "y": 47, "w": 647, "h": 116, "lines": []}, {"k": "eye", "src": "assets/eye-10.webp", "x": 1068, "y": 37, "w": 140, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-10.webp", "x": 72, "y": 153, "w": 367, "h": 115, "lines": [[0, 20], [20, 55], [75, 40]]}, {"k": "desc", "src": "assets/desc-10.webp", "x": 918, "y": 214, "w": 290, "h": 37, "lines": []}]}, {"c": "크리에이티브", "t": "캠페인 로드맵 · 독자 반응", "base": "assets/base-11.webp", "thumb": "assets/thumb-11.webp", "layers": [{"k": "bg", "src": "assets/bg-11.webp", "x": 67, "y": 47, "w": 647, "h": 116, "lines": []}, {"k": "eye", "src": "assets/eye-11.webp", "x": 1070, "y": 37, "w": 138, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-11.webp", "x": 72, "y": 153, "w": 370, "h": 115, "lines": [[0, 20], [20, 55], [75, 40]]}, {"k": "desc", "src": "assets/desc-11.webp", "x": 950, "y": 214, "w": 258, "h": 37, "lines": []}]}, {"c": "FINAL", "t": "BEST 4 비교 · 운영", "base": "assets/base-12.webp", "thumb": "assets/thumb-12.webp", "layers": [{"k": "bg", "src": "assets/bg-12.webp", "x": 66, "y": 75, "w": 669, "h": 148, "lines": []}, {"k": "eye", "src": "assets/eye-12.webp", "x": 1071, "y": 35, "w": 136, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-12.webp", "x": 72, "y": 153, "w": 355, "h": 115, "lines": [[0, 21], [21, 51], [72, 43]]}, {"k": "desc", "src": "assets/desc-12.webp", "x": 660, "y": 213, "w": 548, "h": 38, "lines": []}]}, {"c": "실행", "t": "매체 연계 · KPI", "base": "assets/base-13.webp", "thumb": "assets/thumb-13.webp", "layers": [{"k": "bg", "src": "assets/bg-13.webp", "x": 67, "y": 55, "w": 486, "h": 108, "lines": []}, {"k": "eye", "src": "assets/eye-13.webp", "x": 1077, "y": 37, "w": 131, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-13.webp", "x": 72, "y": 153, "w": 503, "h": 115, "lines": [[0, 20], [20, 55], [75, 40]]}, {"k": "desc", "src": "assets/desc-13.webp", "x": 921, "y": 214, "w": 287, "h": 37, "lines": []}]}, {"c": "실행", "t": "랜딩페이지 구성", "base": "assets/base-14.webp", "thumb": "assets/thumb-14.webp", "layers": [{"k": "bg", "src": "assets/bg-14.webp", "x": 67, "y": 47, "w": 575, "h": 132, "lines": []}, {"k": "eye", "src": "assets/eye-14.webp", "x": 1100, "y": 37, "w": 107, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-14.webp", "x": 72, "y": 153, "w": 553, "h": 115, "lines": [[0, 18], [18, 53], [71, 44]]}, {"k": "desc", "src": "assets/desc-14.webp", "x": 882, "y": 214, "w": 326, "h": 37, "lines": []}]}, {"c": "실행", "t": "인쇄 전 체크리스트", "base": "assets/base-15.webp", "thumb": "assets/thumb-15.webp", "layers": [{"k": "bg", "src": "assets/bg-15.webp", "x": 64, "y": 53, "w": 671, "h": 110, "lines": []}, {"k": "eye", "src": "assets/eye-15.webp", "x": 1107, "y": 37, "w": 100, "h": 10, "lines": []}, {"k": "title", "src": "assets/title-15.webp", "x": 72, "y": 153, "w": 323, "h": 116, "lines": [[0, 20], [20, 53], [73, 43]]}, {"k": "desc", "src": "assets/desc-15.webp", "x": 940, "y": 213, "w": 268, "h": 38, "lines": []}]}, {"c": "미리보기", "t": "Preview 간지 · A1", "base": "assets/base-16.webp", "thumb": "assets/thumb-16.webp", "layers": []}, {"c": "미리보기", "t": "Preview 인덱스", "base": "assets/base-17.webp", "thumb": "assets/thumb-17.webp", "layers": []}, {"c": "미리보기", "t": "미리보기 · B안", "base": "assets/base-18.webp", "thumb": "assets/thumb-18.webp", "layers": []}, {"c": "INDEX 01 · Neon", "t": "Spec · 01 Neon Type", "base": "assets/base-19.webp", "thumb": "assets/thumb-19.webp", "layers": [{"k": "bg", "src": "assets/bg-19.webp", "x": 64, "y": 53, "w": 558, "h": 126, "lines": []}, {"k": "eye", "src": "assets/eye-19.webp", "x": 1055, "y": 38, "w": 152, "h": 11, "lines": []}, {"k": "title", "src": "assets/title-19.webp", "x": 72, "y": 155, "w": 679, "h": 113, "lines": [[0, 17], [17, 55], [72, 41]]}, {"k": "desc", "src": "assets/desc-19.webp", "x": 981, "y": 214, "w": 227, "h": 37, "lines": []}]}, {"c": "INDEX 01 · Neon", "t": "Preview · Neon 1/4", "base": "assets/base-20.webp", "thumb": "assets/thumb-20.webp", "layers": []}, {"c": "INDEX 01 · Neon", "t": "Preview · Neon 2/4", "base": "assets/base-21.webp", "thumb": "assets/thumb-21.webp", "layers": []}, {"c": "INDEX 01 · Neon", "t": "Preview · Neon 3/4", "base": "assets/base-22.webp", "thumb": "assets/thumb-22.webp", "layers": []}, {"c": "INDEX 01 · Neon", "t": "Preview · Neon 4/4", "base": "assets/base-23.webp", "thumb": "assets/thumb-23.webp", "layers": []}, {"c": "INDEX 02 · Split", "t": "Spec · 02 Split Type", "base": "assets/base-24.webp", "thumb": "assets/thumb-24.webp", "layers": [{"k": "bg", "src": "assets/bg-24.webp", "x": 64, "y": 53, "w": 584, "h": 126, "lines": []}, {"k": "eye", "src": "assets/eye-24.webp", "x": 1055, "y": 37, "w": 153, "h": 12, "lines": []}, {"k": "title", "src": "assets/title-24.webp", "x": 72, "y": 155, "w": 746, "h": 113, "lines": [[0, 17], [17, 55], [72, 41]]}, {"k": "desc", "src": "assets/desc-24.webp", "x": 981, "y": 214, "w": 227, "h": 37, "lines": []}]}, {"c": "INDEX 02 · Split", "t": "Preview · Split 1/4", "base": "assets/base-25.webp", "thumb": "assets/thumb-25.webp", "layers": []}, {"c": "INDEX 02 · Split", "t": "Preview · Split 2/4", "base": "assets/base-26.webp", "thumb": "assets/thumb-26.webp", "layers": []}, {"c": "INDEX 02 · Split", "t": "Preview · Split 3/4", "base": "assets/base-27.webp", "thumb": "assets/thumb-27.webp", "layers": []}, {"c": "INDEX 02 · Split", "t": "Preview · Split 4/4", "base": "assets/base-28.webp", "thumb": "assets/thumb-28.webp", "layers": []}, {"c": "INDEX 03 · Emoji · Letter", "t": "Spec · 03 Emoji · Letter Type", "base": "assets/base-29.webp", "thumb": "assets/thumb-29.webp", "layers": [{"k": "bg", "src": "assets/bg-29.webp", "x": 64, "y": 53, "w": 585, "h": 126, "lines": []}, {"k": "eye", "src": "assets/eye-29.webp", "x": 1003, "y": 37, "w": 205, "h": 12, "lines": []}, {"k": "title", "src": "assets/title-29.webp", "x": 72, "y": 155, "w": 747, "h": 113, "lines": [[0, 17], [17, 55], [72, 41]]}, {"k": "desc", "src": "assets/desc-29.webp", "x": 981, "y": 214, "w": 227, "h": 37, "lines": []}]}, {"c": "INDEX 03 · Emoji · Letter", "t": "Preview · Emoji · Letter 1/4", "base": "assets/base-30.webp", "thumb": "assets/thumb-30.webp", "layers": []}, {"c": "INDEX 03 · Emoji · Letter", "t": "Preview · Emoji · Letter 2/4", "base": "assets/base-31.webp", "thumb": "assets/thumb-31.webp", "layers": []}, {"c": "INDEX 03 · Emoji · Letter", "t": "Preview · Emoji · Letter 3/4", "base": "assets/base-32.webp", "thumb": "assets/thumb-32.webp", "layers": []}, {"c": "INDEX 03 · Emoji · Letter", "t": "Preview · Emoji · Letter 4/4", "base": "assets/base-33.webp", "thumb": "assets/thumb-33.webp", "layers": []}, {"c": "INDEX 04 · Emoji · Icon", "t": "Spec · 04 Emoji · Icon Type", "base": "assets/base-34.webp", "thumb": "assets/thumb-34.webp", "layers": [{"k": "bg", "src": "assets/bg-34.webp", "x": 64, "y": 53, "w": 591, "h": 126, "lines": []}, {"k": "eye", "src": "assets/eye-34.webp", "x": 1012, "y": 37, "w": 195, "h": 12, "lines": []}, {"k": "title", "src": "assets/title-34.webp", "x": 72, "y": 155, "w": 873, "h": 113, "lines": [[0, 17], [17, 55], [72, 41]]}, {"k": "desc", "src": "assets/desc-34.webp", "x": 981, "y": 214, "w": 227, "h": 37, "lines": []}]}, {"c": "INDEX 04 · Emoji · Icon", "t": "Preview · Emoji · Icon 1/4", "base": "assets/base-35.webp", "thumb": "assets/thumb-35.webp", "layers": []}, {"c": "INDEX 04 · Emoji · Icon", "t": "Preview · Emoji · Icon 2/4", "base": "assets/base-36.webp", "thumb": "assets/thumb-36.webp", "layers": []}, {"c": "INDEX 04 · Emoji · Icon", "t": "Preview · Emoji · Icon 3/4", "base": "assets/base-37.webp", "thumb": "assets/thumb-37.webp", "layers": []}, {"c": "INDEX 04 · Emoji · Icon", "t": "Preview · Emoji · Icon 4/4", "base": "assets/base-38.webp", "thumb": "assets/thumb-38.webp", "layers": []}, {"c": "INDEX 05 · Graphic · Red", "t": "Spec · 05 Graphic · Red Type", "base": "assets/base-39.webp", "thumb": "assets/thumb-39.webp", "layers": [{"k": "bg", "src": "assets/bg-39.webp", "x": 64, "y": 53, "w": 584, "h": 126, "lines": []}, {"k": "eye", "src": "assets/eye-39.webp", "x": 1002, "y": 37, "w": 206, "h": 12, "lines": []}, {"k": "title", "src": "assets/title-39.webp", "x": 72, "y": 155, "w": 855, "h": 113, "lines": [[0, 17], [17, 55], [72, 41]]}, {"k": "desc", "src": "assets/desc-39.webp", "x": 981, "y": 214, "w": 227, "h": 37, "lines": []}]}, {"c": "INDEX 05 · Graphic · Red", "t": "Preview · Graphic · Red 1/4", "base": "assets/base-40.webp", "thumb": "assets/thumb-40.webp", "layers": []}, {"c": "INDEX 05 · Graphic · Red", "t": "Preview · Graphic · Red 2/4", "base": "assets/base-41.webp", "thumb": "assets/thumb-41.webp", "layers": []}, {"c": "INDEX 05 · Graphic · Red", "t": "Preview · Graphic · Red 3/4", "base": "assets/base-42.webp", "thumb": "assets/thumb-42.webp", "layers": []}, {"c": "INDEX 05 · Graphic · Red", "t": "Preview · Graphic · Red 4/4", "base": "assets/base-43.webp", "thumb": "assets/thumb-43.webp", "layers": []}, {"c": "INDEX 06 · Graphic · Word", "t": "Spec · 06 Graphic · Word Type", "base": "assets/base-44.webp", "thumb": "assets/thumb-44.webp", "layers": [{"k": "bg", "src": "assets/bg-44.webp", "x": 64, "y": 53, "w": 585, "h": 126, "lines": []}, {"k": "eye", "src": "assets/eye-44.webp", "x": 993, "y": 37, "w": 215, "h": 12, "lines": []}, {"k": "title", "src": "assets/title-44.webp", "x": 72, "y": 155, "w": 855, "h": 113, "lines": [[0, 17], [17, 55], [72, 41]]}, {"k": "desc", "src": "assets/desc-44.webp", "x": 981, "y": 214, "w": 227, "h": 37, "lines": []}]}, {"c": "INDEX 06 · Graphic · Word", "t": "Preview · Graphic · Word 1/4", "base": "assets/base-45.webp", "thumb": "assets/thumb-45.webp", "layers": []}, {"c": "INDEX 06 · Graphic · Word", "t": "Preview · Graphic · Word 2/4", "base": "assets/base-46.webp", "thumb": "assets/thumb-46.webp", "layers": []}, {"c": "INDEX 06 · Graphic · Word", "t": "Preview · Graphic · Word 3/4", "base": "assets/base-47.webp", "thumb": "assets/thumb-47.webp", "layers": []}, {"c": "INDEX 06 · Graphic · Word", "t": "Preview · Graphic · Word 4/4", "base": "assets/base-48.webp", "thumb": "assets/thumb-48.webp", "layers": []}, {"c": "Contact", "t": "Contact", "base": "assets/base-49.webp", "thumb": "assets/thumb-49.webp", "layers": []}];
+const GATE_HASH="6236da0786941bae0096ada675837711bf3f1f85014abe7f53a90171ca0591d5",GATE_SALT="NPLEY-NRED",GATE_KEY="npley-nred-ok";
+const hash=async(id,pw)=>{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(`${GATE_SALT}|${id}|${pw}`));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')};
+function boot(){
+const W=1280,H=720,$=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
+const stage=$('stage');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const pc=(v,t)=>(v/t*100)+'%';
+$('tot').textContent=pad(SLIDES.length);
+
+// build slides
+const S=SLIDES.map((s,i)=>{
+  const sec=document.createElement('section');sec.className='sl';sec.setAttribute('aria-label',`${pad(i+1)} ${s.t}`);
+  const base=new Image();base.className='base';base.src=s.base;base.alt='';base.decoding='async';sec.appendChild(base);
+  const parts={bg:[],eye:[],title:[],desc:[],arrow:[]};
+  s.layers.forEach(l=>{
+    const d=document.createElement('div');d.className='ly';
+    Object.assign(d.style,{left:pc(l.x,W),top:pc(l.y,H),width:pc(l.w,W),height:pc(l.h,H)});
+    if(l.k==='title'){
+      const lines=l.lines.length?l.lines:[[0,l.h]];
+      lines.forEach(([t,hh])=>{
+        const m=document.createElement('div');m.className='mask';m.style.top=pc(t,l.h);m.style.height=pc(hh,l.h);
+        const inn=document.createElement('div');inn.className='inner';
+        const im=new Image();im.src=l.src;im.alt='';im.style.top=pc(-t,hh);im.style.height=pc(l.h,hh);
+        inn.appendChild(im);m.appendChild(inn);d.appendChild(m);parts.title.push(inn);
+      });
+    }else{const im=new Image();im.src=l.src;im.alt='';d.appendChild(im);parts[l.k].push(d);}
+    sec.appendChild(d);
+  });
+  stage.appendChild(sec);return {sec,base,...parts};
+});
+
+let idx=-1,tl=null;
+function meta(i){
+  $('cur').textContent=pad(i+1);
+  gsap.to('#prog',{width:((i+1)/SLIDES.length*100)+'%',duration:reduce?0:.8,ease:'power3.out'});
+  const m=[$('chap'),$('name')];
+  const set=()=>{$('chap').textContent=SLIDES[i].c;$('name').textContent=SLIDES[i].t;};
+  if(reduce||idx<0){set();}
+  else gsap.timeline().to(m,{yPercent:-60,autoAlpha:0,duration:.22,ease:'power2.in',stagger:.03,onComplete:set})
+    .fromTo(m,{yPercent:60},{yPercent:0,autoAlpha:1,duration:.5,ease:'power3.out',stagger:.05});
+  try{history.replaceState(null,'','#s'+(i+1))}catch(e){}
+  document.querySelectorAll('.thumb').forEach((t,k)=>t.classList.toggle('on',k===i));
+}
+
+function enter(s,dir,at,t){
+  t.set(s.sec,{visibility:'visible',zIndex:2},at)
+   .set(s.title,{yPercent:dir>0?110:-110,autoAlpha:0},at)
+   .fromTo(s.base,{autoAlpha:0,scale:1.025},{autoAlpha:1,scale:1,duration:1.0,ease:'power2.out'},at)
+   .fromTo(s.bg,{autoAlpha:0,xPercent:5*dir},{autoAlpha:1,xPercent:0,duration:1.3,ease:'power3.out'},at+.08)
+   .fromTo(s.eye,{autoAlpha:0,y:'0.8vh'},{autoAlpha:1,y:0,duration:.6,ease:'power3.out'},at+.15)
+   .to(s.title,{yPercent:0,autoAlpha:1,duration:.9,ease:'power3.out',stagger:.07},at+.2)
+   .fromTo(s.arrow,{autoAlpha:0,xPercent:-30,yPercent:30},{autoAlpha:1,xPercent:0,yPercent:0,duration:.7,ease:'power3.out'},at+.45)
+   .fromTo(s.desc,{autoAlpha:0,y:'0.8vh'},{autoAlpha:1,y:0,duration:.7,ease:'power3.out',stagger:.05},at+.35);
+}
+function leave(s,dir,t){
+  t.set(s.sec,{zIndex:1},0)
+   .to(s.title,{yPercent:dir>0?-110:110,autoAlpha:0,duration:.35,ease:'power2.in',stagger:.03},0)
+   .to([...s.eye,...s.desc,...s.arrow],{autoAlpha:0,y:'-0.8vh',duration:.28,ease:'power2.in'},0)
+   .to(s.bg,{autoAlpha:0,xPercent:-4*dir,duration:.45,ease:'power2.in'},0)
+   .to(s.base,{autoAlpha:0,scale:.99,duration:.48,ease:'power2.inOut'},.08)
+   .set(s.sec,{visibility:'hidden'})
+   .set([s.base,...s.bg,...s.eye,...s.desc,...s.arrow,...s.title],{clearProps:'all'});
+}
+function go(to){
+  if(to<0||to>=SLIDES.length||to===idx)return;
+  if(tl&&tl.isActive())tl.progress(1);
+  const dir=to>idx?1:-1,from=idx;
+  meta(to);idx=to;
+  if(reduce){
+    if(from>=0)gsap.set(S[from].sec,{visibility:'hidden'});
+    gsap.set(S[to].sec,{visibility:'visible'});
+    gsap.set(S[to].title,{yPercent:0,autoAlpha:1});
+    gsap.fromTo(S[to].sec,{autoAlpha:0},{autoAlpha:1,duration:.3});return;
+  }
+  tl=gsap.timeline();
+  let at=0;
+  if(from>=0){leave(S[from],dir,tl);at=.35;}
+  enter(S[to],dir,at,tl);
+}
+
+const h=parseInt((location.hash||'').replace('#s',''),10);
+go(h>=1&&h<=SLIDES.length?h-1:0);
+
+$('next').onclick=()=>go(idx+1);$('prev').onclick=()=>go(idx-1);
+stage.addEventListener('click',e=>{const r=stage.getBoundingClientRect();go(e.clientX-r.left<r.width*.3?idx-1:idx+1)});
+let sx=null;
+stage.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+stage.addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)go(dx<0?idx+1:idx-1);sx=null},{passive:true});
+
+const grid=$('grid'),list=$('gridList');
+SLIDES.forEach((s,i)=>{const b=document.createElement('button');b.className='thumb';b.type='button';
+  b.innerHTML=`<img alt="" src="${s.thumb}"><span><em>${pad(i+1)}</em>${s.t}</span>`;
+  b.onclick=()=>{closeGrid();setTimeout(()=>go(i),reduce?0:200)};list.appendChild(b);});
+function openGrid(){grid.hidden=false;document.querySelectorAll('.thumb').forEach((t,k)=>t.classList.toggle('on',k===idx));
+  if(!reduce)gsap.from('.thumb',{y:16,autoAlpha:0,stagger:.03,duration:.45,ease:'power3.out'});list.children[idx]?.focus()}
+function closeGrid(){grid.hidden=true;stage.focus()}
+$('gridBtn').onclick=openGrid;$('gridClose').onclick=closeGrid;
+$('fsBtn').onclick=()=>{if(document.fullscreenElement){document.exitFullscreen?.().catch(()=>{})}else{document.documentElement.requestFullscreen?.().catch(()=>{})}};
+
+addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key;
+  if(!grid.hidden){if(k==='Escape'||k==='g'||k==='G'){e.preventDefault();closeGrid()}return}
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();go(idx+1)}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();go(idx-1)}
+  else if(k==='Home')go(0);else if(k==='End')go(SLIDES.length-1);
+  else if(k==='g'||k==='G')openGrid();else if(k==='f'||k==='F')$('fsBtn').click();
+});
+}
+function unlock(){document.getElementById('gate').hidden=true;document.getElementById('app').hidden=false;boot()}
+(function(){
+  let ok=false;try{ok=sessionStorage.getItem(GATE_KEY)===GATE_HASH}catch(e){}
+  if(ok)return unlock();
+  const gate=document.getElementById('gate'),err=document.getElementById('gErr');gate.hidden=false;
+  document.getElementById('gId').focus();
+  document.getElementById('gateForm').addEventListener('submit',async e=>{
+    e.preventDefault();err.textContent='';
+    const id=document.getElementById('gId').value.trim().toLowerCase(),pw=document.getElementById('gPw').value;
+    let h='';try{h=await hash(id,pw)}catch(x){err.textContent='이 브라우저에서는 보안 연결(https)이 필요합니다.';return}
+    if(h===GATE_HASH){try{sessionStorage.setItem(GATE_KEY,h)}catch(x){}unlock()}
+    else{err.textContent='아이디 또는 비밀번호가 올바르지 않습니다.';document.getElementById('gPw').select()}
+  });
+})();
+</script>
+
+</body>
+</html>
