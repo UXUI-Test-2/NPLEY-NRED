@@ -63,8 +63,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-r
 .gate{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--bg);padding:24px}
 .gate[hidden],.app[hidden]{display:none}
 .gate form{width:min(100%,340px);display:flex;flex-direction:column;gap:14px}
-.gate h1{margin:0 0 6px;font-size:20px;font-weight:700;letter-spacing:-.02em}
-.gate h1 span{color:var(--accent)}
+.gate h1{margin:0 0 10px;display:flex;align-items:center;gap:18px}
+.gate h1 img{display:block;height:auto;mix-blend-mode:screen}
+.gate h1 .x{color:var(--muted);font-size:22px;line-height:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .gate p{margin:0 0 6px;font-size:13px;color:var(--muted)}
 .gate label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}
 .gate input{font:inherit;font-size:15px;color:var(--fg);background:var(--chrome);border:1px solid var(--line);border-radius:6px;height:42px;padding:0 12px}
@@ -78,7 +80,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-r
 <body>
 <div class="gate" id="gate" hidden>
   <form id="gateForm" autocomplete="off">
-    <h1>NPLEY × <span>NRED</span> 제안서</h1>
+    <h1><img src="assets/npley-logo.png" width="150" alt="NPLEY"><span class="x" aria-hidden="true">×</span><img src="assets/nred-logo.png" width="112" alt="NRED"><span class="sr"> 제안서</span></h1>
     <p>아이디와 비밀번호를 입력해 주세요.</p>
     <label>아이디<input id="gId" name="id" type="text" autocapitalize="none" spellcheck="false" required></label>
     <label>비밀번호<input id="gPw" name="pw" type="password" required></label>
